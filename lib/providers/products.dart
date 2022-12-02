@@ -6,11 +6,8 @@ import 'package:shop_app/providers/product.dart';
 import 'package:http/http.dart' as http;
 
 class Products with ChangeNotifier {
-
-
-
-  final List<Product> _items = [
-    Product(
+   List<Product> _items = [
+   /* Product(
       id: 'p1',
       title: 'Red Shirt',
       description: 'A red shirt - it is pretty red!',
@@ -41,7 +38,7 @@ class Products with ChangeNotifier {
       price: 49.99,
       imageUrl:
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
+    ),*/
   ];
 
   // var _showFavoritesOnly = false;
@@ -72,8 +69,33 @@ class Products with ChangeNotifier {
   }
 
 
+  Future<void> fetchAndSetProducts() async {
+    const url =
+        'https://shopapp-2602f-default-rtdb.firebaseio.com/products.json';
+    try{
+      final response = await http.get(Uri.parse(url));
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+     final List<Product> loadedProducts = [];
+      extractedData.forEach((prodId, prodData) {
+        loadedProducts.add(Product(
+            id: prodId,
+            title: prodData['title'],
+            description: prodData['description'],
+            price: prodData['price'],
+            imageUrl: prodData['imageUrl'],
+            isFavorite: prodData['isFavorite']));
 
-  Future<void> addProduct(Product product)   async {
+      });
+      _items = loadedProducts;
+      notifyListeners();
+    }catch(error){
+      throw (error);
+
+    }
+
+  }
+
+  Future<void> addProduct(Product product) async {
     const url =
         'https://shopapp-2602f-default-rtdb.firebaseio.com/products.json';
 
@@ -85,23 +107,20 @@ class Products with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-         'isFavorite': product.isFavorite,
+          'isFavorite': product.isFavorite,
         }),
-      ).then((response){
-        print(json.decode(response.body));
-        final newProduct = Product(
-          title: product.title,
-          description: product.description,
-          price: product.price,
-          imageUrl: product.imageUrl,
-          id: json.decode(response.body)['name'],
-        );
-        _items.add(newProduct);
-        notifyListeners();
+      );
 
-      });
-
-
+      print(json.decode(response.body));
+      final newProduct = Product(
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        id: json.decode(response.body)['name'],
+      );
+      _items.add(newProduct);
+      notifyListeners();
 
       // _items.insert(0, newProduct); // at the start of the list
 
@@ -110,7 +129,8 @@ class Products with ChangeNotifier {
       throw error;
     }
   }
-    /*final newProduct = Product(
+
+  /*final newProduct = Product(
         id: DateTime.now().toString(),
         title: product.title,
         description: product.description,
@@ -135,8 +155,3 @@ class Products with ChangeNotifier {
     log('inside delet');
   }
 }
-
-
-
-
-
