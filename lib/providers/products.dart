@@ -6,6 +6,9 @@ import 'package:shop_app/providers/product.dart';
 import 'package:http/http.dart' as http;
 
 class Products with ChangeNotifier {
+
+
+
   final List<Product> _items = [
     Product(
       id: 'p1',
@@ -70,33 +73,51 @@ class Products with ChangeNotifier {
 
 
 
-  void addProduct(Product product)   {
-   var url =" https://shopapp-2602f-default-rtdb.firebaseio.com/userprofile.json";
-    http.post(url,body:json.encode());
-   (
-       http.post("https://fir-flutter-d60b0.firebaseio.com/userprofile.json",
-           body: json.encode({
-             'firstName': firstNameController.text,
-             'lastName': lastNameController.text,
-             'email': emailController.text,
-           }));
-       setState(() {
-     userProfile.add(Profile(
-       firstName: firstNameController.text,
-       lastName: lastNameController.text,
-       email: emailController.text,
-     ));
-   });
-   )
-    final newProduct = Product(
+  Future<void> addProduct(Product product)   async {
+    const url =
+        'https://shopapp-2602f-default-rtdb.firebaseio.com/products.json';
+
+    try {
+      final response = await http.post(
+        (Uri.parse(url)),
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price,
+         'isFavorite': product.isFavorite,
+        }),
+      ).then((response){
+        print(json.decode(response.body));
+        final newProduct = Product(
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          imageUrl: product.imageUrl,
+          id: json.decode(response.body)['name'],
+        );
+        _items.add(newProduct);
+        notifyListeners();
+
+      });
+
+
+
+      // _items.insert(0, newProduct); // at the start of the list
+
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+    /*final newProduct = Product(
         id: DateTime.now().toString(),
         title: product.title,
         description: product.description,
         price: product.price,
         imageUrl: product.imageUrl);
     _items.add(newProduct);
-    notifyListeners();
-  }
+    notifyListeners();*/
 
   void updateProduct(String id, Product newProduct) {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
@@ -114,3 +135,8 @@ class Products with ChangeNotifier {
     log('inside delet');
   }
 }
+
+
+
+
+

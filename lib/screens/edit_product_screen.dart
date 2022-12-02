@@ -20,7 +20,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final _imageUrlFocusNode = FocusNode();
   final _form = GlobalKey<FormState>();
   var _editedProduct =
-  Product(id: ' ', title: '', description: '', price: 0, imageUrl: '');
+      Product(id: ' ', title: '', description: '', price: 0, imageUrl: '');
   var _isInit = true;
   var _initValues = {
     'title': '',
@@ -68,7 +68,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void _updateImageUrl() {
     if (!_imageUrlFocusNode.hasFocus) {
       if (!_imageUrlController.text.startsWith('http') &&
-          !_imageUrlController.text.startsWith('https') ||
+              !_imageUrlController.text.startsWith('https') ||
           !_imageUrlController.text.endsWith('.png') &&
               !_imageUrlController.text.endsWith('.jpg') &&
               !_imageUrlController.text.endsWith('.jpeg')) {
@@ -84,7 +84,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
       return;
     }
     _form.currentState?.save();
-    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    if (_editedProduct.id != ' ') {
+      Provider.of<Products>(context, listen: false)
+          .updateProduct(_editedProduct.id, _editedProduct);
+    } else {
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    }
+
     Navigator.of(context).pop();
   }
 
@@ -186,15 +192,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       child: _imageUrlController.text.isEmpty
                           ? Text('Enter a URL')
                           : FittedBox(
-                        child: Image.network(
-                          _imageUrlController.text,
-                          fit: BoxFit.cover,
-                        ),
-                      )),
+                              child: Image.network(
+                                _imageUrlController.text,
+                                fit: BoxFit.cover,
+                              ),
+                            )),
                   Expanded(
                     child: TextFormField(
                         decoration:
-                        const InputDecoration(labelText: 'Image URL'),
+                            const InputDecoration(labelText: 'Image URL'),
                         keyboardType: TextInputType.url,
                         textInputAction: TextInputAction.done,
                         controller: _imageUrlController,
