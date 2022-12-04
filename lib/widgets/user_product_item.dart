@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/screens/edit_product_screen.dart';
 
+import '../models/http_exception.dart';
 import '../providers/products.dart';
 
 class UserProductItem extends StatelessWidget {
@@ -37,21 +40,29 @@ class UserProductItem extends StatelessWidget {
                 try {
                   await Provider.of<Products>(context, listen: false)
                       .deleteProduct(id);
-                } catch (error) {
+                }  on  HttpException catch(e){
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text(
                       'Deleting failed!',
                       textAlign: TextAlign.center,
                     ),
                   ));
-
-                  /*scaffold.showBottomSheet((context) =>  SnackBar(content: Text(
-                    'Deleting is  failed',
-                    textAlign: TextAlign.center,
-                  )
-
-                      ));*/
+                } on NetException catch(e){
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text(
+                      'Network issue!!!',
+                      textAlign: TextAlign.center,
+                    ),
+                  ));
+                } catch(e){
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text(
+                      'Somthing wentwrong try again',
+                      textAlign: TextAlign.center,
+                    ),
+                  ));
                 }
+
               },
               icon: Icon(Icons.delete),
               color: Theme.of(context).errorColor,
