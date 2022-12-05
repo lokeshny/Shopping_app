@@ -20,16 +20,22 @@ class OrderItem {
 
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
+  final String authToken;
+  final String userId;
+
+
+  Orders(this._orders, this.authToken, this.userId);
 
   List<OrderItem> get orders {
     return [..._orders];
   }
 
   Future<void> fetchAndSetOrder() async {
-    const url = 'https://shopapp-2602f-default-rtdb.firebaseio.com/orders.json';
+    final url = 'https://shopapp-2602f-default-rtdb.firebaseio.com/orders/$userId.json?auth=$authToken';
     final response = await http.get(Uri.parse(url));
     final List<OrderItem> loadedOrder = [];
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    print(extractedData);
     if(extractedData == null){
       return;
     }
@@ -46,14 +52,15 @@ class Orders with ChangeNotifier {
                 price: item['price'],
                 quantity: item['quantity']))
             .toList(),
-      ));
+      ),
+      );
     });
-    _orders =loadedOrder.reversed.toList();
+    _orders = loadedOrder.reversed.toList();
     notifyListeners();
   }
 
   Future<void> addOrder(List<CartItem> cartProduct, double total) async {
-    const url = 'https://shopapp-2602f-default-rtdb.firebaseio.com/orders.json';
+    final url = 'https://shopapp-2602f-default-rtdb.firebaseio.com/orders/ $userId.json?auth=$authToken';
     final timeStamp = DateTime.now();
     final response = await http.post(Uri.parse(url),
         body: json.encode({
@@ -63,8 +70,9 @@ class Orders with ChangeNotifier {
               .map((cp) => {
                     'id': cp.id,
                     'title': cp.title.length,
+                    'quantity': cp.quantity,
                     'price': cp.price,
-                    'quantity': cp.quantity
+
                   })
               .toList(),
         }));
@@ -73,8 +81,8 @@ class Orders with ChangeNotifier {
       OrderItem(
         id: json.decode(response.body)['name'],
         amount: total,
+        dateTime: timeStamp,
         products: cartProduct,
-        dateTime: DateTime.now(),
       ),
     );
     notifyListeners();

@@ -146,8 +146,8 @@ class _AuthCardState extends State<AuthCard>
       _showErrorDailog(errorMessage);
 
     } catch(error){
-      const errorMessage = 'could not authenticate';
-      _showErrorDailog(errorMessage);
+     /* const errorMessage = 'could not authenticate';
+      _showErrorDailog(errorMessage);*/
     }
     setState(() {
       _isLoading = false;

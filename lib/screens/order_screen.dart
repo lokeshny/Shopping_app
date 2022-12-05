@@ -20,17 +20,16 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    /*Future.delayed(Duration.zero).then((_) async {*/
+    Future.delayed(Duration.zero).then((_) async {
 
-       /* _isLoading = true;
+        _isLoading = true;
 
        Provider.of<Orders>(context, listen: false).fetchAndSetOrder().then((_) {
          setState(() {
            _isLoading = false;
          });
        });
-      */
-   /* });*/
+    });
     super.initState();
   }
 
@@ -50,16 +49,18 @@ class _OrderScreenState extends State<OrderScreen> {
             if (dataSnapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else {
-              if (dataSnapshot.error != null) {
+              if (dataSnapshot.error == null) {
                 return const Center(
                   child: Text('An error occurred'),
                 );
               } else {
+                print(dataSnapshot);
                 return Consumer<Orders>(
                   builder: (context, ordersData, child) => ListView.builder(
                     itemCount: ordersData.orders.length,
                     itemBuilder: (context, i) =>
                         OrderItem(ordersData.orders[i]),
+
                   ),
                 );
               }
