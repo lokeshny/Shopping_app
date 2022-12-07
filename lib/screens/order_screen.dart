@@ -22,13 +22,13 @@ class _OrderScreenState extends State<OrderScreen> {
     // TODO: implement initState
     Future.delayed(Duration.zero).then((_) async {
 
-        _isLoading = true;
+      _isLoading = true;
 
-       Provider.of<Orders>(context, listen: false).fetchAndSetOrder().then((_) {
-         setState(() {
-           _isLoading = false;
-         });
-       });
+      Provider.of<Orders>(context, listen: false).fetchAndSetOrder().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
     });
     super.initState();
   }
@@ -36,7 +36,7 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     print('building orderss!!');
-   /* final orderData = Provider.of<Orders>(context);*/
+    /* final orderData = Provider.of<Orders>(context);*/
     return Scaffold(
         appBar: AppBar(
           title: const Text('Your Orders'),

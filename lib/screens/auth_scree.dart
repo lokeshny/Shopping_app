@@ -104,12 +104,12 @@ class _AuthCardState extends State<AuthCard>
 
   void _showErrorDailog(String message){
     showDialog(context: context, builder: (context)=>AlertDialog(title: Text('An error accured!'),
-    content: Text(message),
-    actions: [
-      TextButton(onPressed: () {
-        Navigator.of(context).pop();
-      }, child: const Text('Okay'))
-    ],));
+      content: Text(message),
+      actions: [
+        TextButton(onPressed: () {
+          Navigator.of(context).pop();
+        }, child: const Text('Okay'))
+      ],));
   }
 
   void _submit()  async {
@@ -132,21 +132,21 @@ class _AuthCardState extends State<AuthCard>
       Navigator.of(context).pushReplacementNamed('/products-overview');
     } on HttpException catch (e){
       var errorMessage = 'Authentication failed';
-     if(e.toString().contains('EMAIL_EXISTS')){
-       errorMessage = " This email address exist";
-     }else if(e.toString().contains("INVALID_EMAIL")){
-       errorMessage = "This not a valid email";
-     }else if(e.toString().contains("WEAK_PASSWORD")){
-       errorMessage = "This password is too week";
-     }else if(e.toString().contains("EMAIL_NOT_FOUND")){
-       errorMessage = "could not find user with this email";
-     }else if(e.toString().contains("INVALID_PASSWORD")){
-       errorMessage = "invalid  password";
-     }
+      if(e.toString().contains('EMAIL_EXISTS')){
+        errorMessage = " This email address exist";
+      }else if(e.toString().contains("INVALID_EMAIL")){
+        errorMessage = "This not a valid email";
+      }else if(e.toString().contains("WEAK_PASSWORD")){
+        errorMessage = "This password is too week";
+      }else if(e.toString().contains("EMAIL_NOT_FOUND")){
+        errorMessage = "could not find user with this email";
+      }else if(e.toString().contains("INVALID_PASSWORD")){
+        errorMessage = "invalid  password";
+      }
       _showErrorDailog(errorMessage);
 
     } catch(error){
-     /* const errorMessage = 'could not authenticate';
+      /* const errorMessage = 'could not authenticate';
       _showErrorDailog(errorMessage);*/
     }
     setState(() {
@@ -221,10 +221,10 @@ class _AuthCardState extends State<AuthCard>
                     controller: _passwordController,
                     validator: _authMode == AuthMode.Signup
                         ? (value) {
-                            if (value! != _passwordController.text) {
-                              return 'Password is too short!';
-                            }
-                          }
+                      if (value! != _passwordController.text) {
+                        return 'Password is too short!';
+                      }
+                    }
                         : null,
                     onSaved: (value) {
                       _authData['password'] = value!;
@@ -236,7 +236,7 @@ class _AuthCardState extends State<AuthCard>
                 else
                   ElevatedButton(
                     child:
-                        Text(_authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP'),
+                    Text(_authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP'),
                     onPressed: _submit,
                   ),
                 TextButton(

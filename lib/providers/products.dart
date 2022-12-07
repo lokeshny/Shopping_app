@@ -45,10 +45,11 @@ class Products with ChangeNotifier {
   // var _showFavoritesOnly = false;
 
   final String? authToken;
+ final String? userId;
 
 
 
-  Products(this.authToken, this._items,);
+  Products(this.authToken, this._items, this.userId,);
 
   List<Product> get items {
     // if(_showFavoritesOnly){
@@ -75,15 +76,19 @@ class Products with ChangeNotifier {
     return _items.firstWhere((prod) => prod.id == id);
   }
 
-  Future<void> fetchAndSetProducts() async {
-    final url =
-        'https://shopapp-2602f-default-rtdb.firebaseio.com/products.json?auth=$authToken';
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    final filterString = filterByUser ? 'orderBy="createrId"&equalTo="$userId"': '';
+    var url =
+        'https://shopapp-2602f-default-rtdb.firebaseio.com/products.json?auth=$authToken&$filterString';
     try {
       final response = await http.get(Uri.parse(url));
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       if(extractedData == null){
         return;
       }
+      url =  'https://shopapp-2602f-default-rtdb.firebaseio.com/userFavorites/$userId.json?auth=$authToken';
+      final favoriteResponse = await http.get(Uri.parse(url));
+      final favoriteData = json.decode(favoriteResponse.body);
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
@@ -92,7 +97,8 @@ class Products with ChangeNotifier {
             description: prodData['description'],
             price: prodData['price'],
             imageUrl: prodData['imageUrl'],
-            isFavorite: prodData['isFavorite']));
+           /* isFavorite: prodData['isFavorite']));*/
+            isFavorite: favoriteData == null ? false : favoriteData[prodId] ?? false ));
       });
       _items = loadedProducts;
       notifyListeners();
@@ -112,9 +118,11 @@ class Products with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-          'isFavorite': product.isFavorite,
+         /* 'createrId':userId,*/
+
         }),
       );
+      print(response);
 
       print(json.decode(response.body));
       final newProduct = Product(
@@ -165,7 +173,7 @@ class Products with ChangeNotifier {
 
   Future<void> deleteProduct(String id) async {
     final url =
-        'https://shopapp-2602f-default-rtdb.firebaseio.com/products/$id.json';
+        'https://shopapp-2602f-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken';
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     Product? existingProduct = _items[existingProductIndex];
     try{
@@ -185,10 +193,6 @@ class Products with ChangeNotifier {
       throw NetException("Somthing went wron!!");
 
     }
-
-
-
-
 
   }
 }

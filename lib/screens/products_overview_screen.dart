@@ -39,10 +39,12 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
     if(_isInit){
       setState((){
         _isLoading  = true;
+
       });
 
       Provider.of<Products>(context).fetchAndSetProducts().then((_) {
         setState((){
+          print('22222222222222');
           _isLoading  = false;
         });
       });
@@ -70,15 +72,15 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
               },
               icon: const Icon(Icons.more_vert),
               itemBuilder: (_) => [
-                    const PopupMenuItem(
-                      value: FilterOptions.Favorites,
-                      child: Text('Only Favorites'),
-                    ),
-                    const PopupMenuItem(
-                      value: FilterOptions.All,
-                      child: Text('Show All'),
-                    ),
-                  ]),
+                const PopupMenuItem(
+                  value: FilterOptions.Favorites,
+                  child: Text('Only Favorites'),
+                ),
+                const PopupMenuItem(
+                  value: FilterOptions.All,
+                  child: Text('Show All'),
+                ),
+              ]),
           Consumer<Cart>(
             builder: (_, cart, ch) => Badge(
               value: cart.itemCount.toString(),

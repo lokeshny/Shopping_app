@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
@@ -13,15 +14,15 @@ class OrderItem {
 
   OrderItem(
       {required this.id,
-      required this.amount,
-      required this.products,
-      required this.dateTime});
+        required this.amount,
+        required this.products,
+        required this.dateTime});
 }
 
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
-  final String authToken;
-  final String userId;
+  final String? authToken;
+  final String? userId;
 
 
   Orders(this._orders, this.authToken, this.userId);
@@ -34,8 +35,10 @@ class Orders with ChangeNotifier {
     final url = 'https://shopapp-2602f-default-rtdb.firebaseio.com/orders/$userId.json?auth=$authToken';
     final response = await http.get(Uri.parse(url));
     final List<OrderItem> loadedOrder = [];
-    final extractedData = json.decode(response.body) as Map<String, dynamic>;
-    print(extractedData);
+    log(response.toString());
+
+    final  extractedData = json.decode(response.body) as Map<String, dynamic>;
+
     if(extractedData == null){
       return;
     }
@@ -47,10 +50,10 @@ class Orders with ChangeNotifier {
         dateTime: DateTime.parse(orderData['dateTime']),
         products: (orderData['products'] as List<dynamic>)
             .map((item) => CartItem(
-                id: item['id'],
-                title: item['title'],
-                price: item['price'],
-                quantity: item['quantity']))
+            id: item['id'],
+            title: item['title'],
+            price: item['price'],
+            quantity: item['quantity']))
             .toList(),
       ),
       );
@@ -58,6 +61,36 @@ class Orders with ChangeNotifier {
     _orders = loadedOrder.reversed.toList();
     notifyListeners();
   }
+  /*Future<void> fetchAndSetOrder() async {
+    final url =
+        'https://shopapp-2602f-default-rtdb.firebaseio.com/orders/$userId.json?auth=$authToken';
+    final response = await http.get(Uri.parse(url));
+    final List<OrderItem> loadedOrders = [];
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return;
+    }
+    extractedData.forEach((orderId, orderData) {
+      loadedOrders.add(
+        OrderItem(
+          id: orderId,
+          amount: orderData['amount'],
+          dateTime: DateTime.parse(orderData['dateTime']),
+          products: (orderData['products'] as List<dynamic>)
+              .map((item) => CartItem(
+            id: item['id'],
+            title: item['title'],
+            price: item['price'],
+            quantity: item['quantity'],
+          ))
+              .toList(),
+        ),
+      );
+    });
+    _orders = loadedOrders.reversed.toList();
+    notifyListeners();
+  }*/
+
 
   Future<void> addOrder(List<CartItem> cartProduct, double total) async {
     final url = 'https://shopapp-2602f-default-rtdb.firebaseio.com/orders/ $userId.json?auth=$authToken';
@@ -68,12 +101,12 @@ class Orders with ChangeNotifier {
           'dateTime': timeStamp.toIso8601String(),
           'product': cartProduct
               .map((cp) => {
-                    'id': cp.id,
-                    'title': cp.title.length,
-                    'quantity': cp.quantity,
-                    'price': cp.price,
+            'id': cp.id,
+            'title': cp.title.length,
+            'quantity': cp.quantity,
+            'price': cp.price,
 
-                  })
+          })
               .toList(),
         }));
     _orders.insert(
